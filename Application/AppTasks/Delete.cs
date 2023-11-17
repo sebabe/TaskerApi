@@ -2,33 +2,29 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Application.Core;
-using Domain;
 using MediatR;
 using Persistence;
 
 namespace Application.AppTasks
 {
-    public class Details
+    public class Delete
     {
-        public class Query : IRequest<Result<AppTask>>{
+        public class Command : IRequest{
             public Guid Id { get; set; }
         }
 
-        public class Handler : IRequestHandler<Query, Result<AppTask>>
+        public class Handle : IRequestHandler<Command>
         {
         private readonly DataContext _context;
-        
-            public Handler(DataContext context)
+            public Handle(DataContext context)
             {
             _context = context;
-            
             }
 
-            public async Task<Result<AppTask>> Handle(Query request, CancellationToken cancellationToken)
+            async Task IRequestHandler<Command>.Handle(Command request, CancellationToken cancellationToken)
             {
                 var appTask = await _context.AppTasks.FindAsync(request.Id);
-                return Result<AppTask>.Success(appTask);
+                _context.AppTasks.Remove(appTask);
             }
         }
     }
