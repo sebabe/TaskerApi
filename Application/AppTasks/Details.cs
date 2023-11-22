@@ -28,6 +28,10 @@ namespace Application.AppTasks
             public async Task<Result<AppTask>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var appTask = await _context.AppTasks.FindAsync(request.Id);
+                if (appTask == null)
+                {
+                    return Result<AppTask>.Failure("Not found");
+                }
                 return Result<AppTask>.Success(appTask);
             }
         }

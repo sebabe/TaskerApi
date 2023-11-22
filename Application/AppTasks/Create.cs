@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Core;
 using Domain;
 using FluentValidation;
 using MediatR;
@@ -11,7 +12,7 @@ namespace Application.AppTasks
 {
     public class Create
     {
-        public class Command : IRequest{
+        public class Command : IRequest<Result<Unit>>{
             public AppTask AppTask { get; set; }
         }
 
@@ -23,7 +24,7 @@ namespace Application.AppTasks
             }
         }
 
-        public class Handler : IRequestHandler<Command>
+        public class Handler : IRequestHandler<Command, Result<Unit>>
         {
         private readonly DataContext _context;
             public Handler(DataContext context)
@@ -31,10 +32,15 @@ namespace Application.AppTasks
             _context = context;
             }
 
-            public async Task Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
                 _context.AppTasks.Add(request.AppTask);
-                await _context.SaveChangesAsync();
+                var result = await _context.SaveChangesAsync() > 0;
+                if (!result)
+                {
+                    return Result<Unit>.Failure("Cannot create record");
+                }
+                return Result<Unit>.Success(Unit.Value);
             }
         }
     }

@@ -10,8 +10,8 @@ namespace API.Controllers
     {
 
         [HttpGet]
-        public async Task<ActionResult<List<AppTask>>> GetAppTasks(){
-            return await Mediator.Send(new List.Query());
+        public async Task<IActionResult> GetAppTasks(){
+            return HandleResult(await Mediator.Send(new List.Query()));
         }
 
         [HttpGet("{id}")]
@@ -22,8 +22,12 @@ namespace API.Controllers
 
         [HttpPost]
         public async Task<IActionResult> CreateAppTask(AppTask appTask){
-            await Mediator.Send(new Create.Command {AppTask = appTask});
-            return Ok();
+            return HandleResult(await Mediator.Send(new Create.Command {AppTask = appTask}));
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> ChangeAppTask(Guid id, AppTask appTask){
+            return HandleResult(await Mediator.Send(new Change.Command { Id = id, AppTask = appTask}));
         }
 
         [HttpDelete]
