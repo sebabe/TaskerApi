@@ -35,7 +35,7 @@ namespace Persistence
 
             await context.AppTasks.AddRangeAsync(AppTasks);
             await context.SaveChangesAsync();
-            if (!userManager.Users.Any()) return;
+            if (userManager.Users.Any()) return;
 
             var appUsers = new List<AppUser>{
                 new AppUser{
